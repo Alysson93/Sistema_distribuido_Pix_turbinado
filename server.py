@@ -10,6 +10,7 @@ db = Database()
 mutex = threading.Lock()
 
 def handle_request(client):
+	mutex.acquire()
 	request = client.recv(2048).decode()
 	pid, _, user, password, option, pixkey, value = request.split('|')
 	response = ''
@@ -19,8 +20,7 @@ def handle_request(client):
 	elif option == '2':
 		db.send_value(user, password, pixkey, value)
 		response = 'Transferência realizada'
-	mutex.acquire()
-	client.sendall(response.encode())
+	client.sendall(response.encode('utf-8'))
 	mutex.release()
 	client.close()
 

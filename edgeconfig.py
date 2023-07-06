@@ -8,7 +8,7 @@ def main(ip, port):
 	sock.bind((ip, port))
 	sock.listen()
 
-	print(f'Edge is runnin on {ip}:{port}')
+	print(f'Edge is running on {ip}:{port}')
 
 	while True:
 		balancer, _ = sock.accept()
