@@ -23,7 +23,15 @@ cursor.execute('''
 cursor.execute('''
 	INSERT INTO users (name, password, balance, pixkey)
 	VALUES ('usuario1', 'senha1', 100, 'chave1'),
-	('usuario2', 'senha2', 100, 'chave2');
+	('usuario2', 'senha2', 100, 'chave2'),
+	('usuario3', 'senha3', 100, 'chave3'),
+	('usuario4', 'senha4', 100, 'chave4'),
+	('usuario5', 'senha5', 100, 'chave5'),
+	('usuario6', 'senha6', 100, 'chave6'),
+	('usuario7', 'senha7', 100, 'chave7'),
+	('usuario8', 'senha8', 100, 'chave8'),
+	('usuario9', 'senha9', 100, 'chave9'),
+	('usuario0', 'senha0', 100, 'chave0');
 ''')
 conn.commit()
 
