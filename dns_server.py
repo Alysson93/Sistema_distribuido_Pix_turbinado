@@ -1,8 +1,8 @@
 import socket
 
 domain_mappings = {
-	'exemplo.com': ('127.0.0.1', 8080),
-	'teste.com': ('127.0.0.1', 8081),
+	'exemplo.com': ('127.0.0.1', 6000),
+	'teste.com': ('127.0.0.1', 6001),
 }
 
 ip = '127.0.0.1'

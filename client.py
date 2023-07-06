@@ -1,4 +1,7 @@
 import socket
+import os
+
+pid = str(os.getpid())
 
 dns_ip = '127.0.0.1'
 dns_port = 5000
@@ -18,13 +21,26 @@ def get_load_balancer(url):
 	else:
 		raise Exception('URL desconhecida.')
 
+
+##############################
+
+def send_to_load_balancer(ip, port):
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.connect((ip, port))
+	sock.sendall('ola mundo'.encode())
+	response = sock.recv(2048).decode()
+	sock.close()
+	return response
+
+
 ##############################
 
 def main():
 	url = input('URL: ')
 	try:
 		ip, port = get_load_balancer(url)
-		print(ip, port)
+		response = send_to_load_balancer(ip, port)
+		print(response)
 	except Exception as e:
 		print(e)
 
