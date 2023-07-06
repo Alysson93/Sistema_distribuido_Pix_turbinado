@@ -27,14 +27,15 @@ def get_load_balancer(url):
 def send_to_load_balancer(ip, port):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	sock.connect((ip, port))
-	user = input('Uusário: ')
-	password = input('Password: ')
+	user = input('Usuário: ')
+	password = input('Senha: ')
 	print('Que operação você deseja realizar?')
 	print('1 - Imprimir saldo')
 	print('2 - Fazer transferência')
 	option = input('Digite sua opção aqui: ')
 	pixkey = input('Chave destino: ') if option == '2' else '0'
-	message = f'{pid}|1|{user}|{password}|{option}|{pixkey}'
+	value = float(input('Valor a ser transferido: ')) if option == '2' else '0'
+	message = f'{pid}|1|{user}|{password}|{option}|{pixkey}|{value}'
 	sock.sendall(message.encode())
 	response = sock.recv(2048).decode()
 	sock.close()

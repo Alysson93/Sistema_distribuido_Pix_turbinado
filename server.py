@@ -1,62 +1,44 @@
-import threading
 import socket
+import threading
+import os
+from Database import Database
 
-ocupante = None
-fila = []
+ip = '127.0.0.1'
+port = 8000
+db = Database()
 
-def thread_servidor():
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-		s.bind(('127.0.0.1', 8000))
-		s.listen()
-		while True:
-			conexao, endereco = s.accept()
-			threading.Thread(target=thread_cliente, args=(conexao,)).start()
+mutex = threading.Lock()
 
+def handle_request(client):
+	request = client.recv(2048).decode()
+	pid, _, user, password, option, pixkey, value = request.split('|')
+	response = ''
+	if option == '1':
+		response = db.get_balance(user, password)
+		response = str(response[0][0])
+	elif option == '2':
+		db.send_value(user, password, pixkey, value)
+		response = 'Transferência realizada'
+	mutex.acquire()
+	client.sendall(response.encode())
+	mutex.release()
+	client.close()
 
+##############################
 
-def thread_solicitacoes():
-	global ocupante
+def main():
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.bind((ip, port))
+	sock.listen(5)
+
+	print(f'Server is running on {ip}:{port}')
+
 	while True:
-		if len(fila) > 0 and ocupante is None:
-			ocupante = fila.pop(0)
-			msg_grant(ocupante)
+		client, addr = sock.accept()
+		thread = threading.Thread(target=handle_request, args=(client,))
+		thread.start()
 
+##############################
 
-def thread_terminal():
-	while True:
-		comando = input('Digite status para ver o status da região crítica e da fila de solicitações, ou exit para sair: ')
-		if comando == 'status':
-			print(f'{ocupante.getsockname()[1]} é o ocupante atual da região crítica')
-			print(f'Fila de solicitações: {fila}')
-		elif comando == 'exit':
-			break
-		else:
-			print('Comando inválido')
-
-
-
-def thread_cliente(conexao):
-	global ocupante
-	with conexao:
-		while True:
-			data = conexao.recv(2048)
-			if not data:
-				break
-			mensagem = data.decode()
-			if mensagem == 'REQUEST':
-				fila.append(conexao)
-			elif mensagem == 'RELEASE':
-				if ocupante == conexao:
-					ocupante = None
-					if len(fila) > 0:
-						ocupante = fila.pop(0)
-						msg_grant(ocupante)
-
-
-def msg_grant(conexao):
-	conexao.sendall(b'GRANT')
-
-
-threading.Thread(target=thread_servidor).start()
-threading.Thread(target=thread_solicitacoes).start()
-threading.Thread(target=thread_terminal).start()
+if __name__ == '__main__':
+	main()
